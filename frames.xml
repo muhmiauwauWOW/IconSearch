@@ -4,16 +4,16 @@
 
 
 	<Frame name="IconSelectorSectionTemplate" mixin="IconSelectorSectionMixin" virtual="true">
-		
+	
 		<Size x="474" y="36"/>
 		<Anchors>
-			<Anchor point="TOPLEFT" x="20" y="0"/>
+			<Anchor point="TOPLEFT" x="0" y="0"/>
 		</Anchors>
 		<Frames>
 			<Button parentKey="Title" >
 				<Size x="474" y="36"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" x="20" y="0"/>
+					<Anchor point="TOPLEFT" x="0" y="0"/>
 				</Anchors>
 				<ButtonText parentKey="ButtonText" nonspacewrap="true" justifyH="LEFT">
 					<Size x="234" y="10"/>
@@ -21,44 +21,79 @@
 						<Anchor point="LEFT" x="8" y="1"/>
 					</Anchors>
 				</ButtonText>
-				<NormalTexture atlas="questlog-tab"/>
-				<HighlightTexture atlas="questlog-tab" alphaMode="ADD" alpha="0.4"/>
+				<NormalTexture >
+					<Color r="0" g="0" b="0" a="1" />
+				</NormalTexture>
+				<HighlightTexture >
+					<Color r="1" g="1" b="1" a="0.1" />
+				</HighlightTexture>
 				<NormalFont style="Game15Font_Shadow"/>
 				<HighlightFont style="Game15Font_Shadow"/>
 			</Button>
 
 			<Frame parentKey="IconSelector" inherits="SelectorTemplate" mixin="IconSelectorMixin" >
-				<KeyValues>
-					<KeyValue key="buttonTemplate" value="IconSearchButtonTemplate" type="string"/>
-				</KeyValues>
-				<Size x="494" y="361"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" x="21" y="-22"/>
+					<Anchor point="TOPLEFT" x="6" y="-36"/>
+					<Anchor point="BOTTOMRIGHT" x="6" y="6"/>
 				</Anchors>
+				<Frames>
+					<Frame parentKey="NoSearchResultsText" hidden="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" x="0" y="0"/>
+							<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString inherits="SystemFont_Med3" text="QUEST_LOG_NO_RESULTS" >
+									<Size x="450" y="36" />
+									<Anchors>
+										<Anchor point="TOP"  y="0"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnLoad method="OnLoad"/>
+				</Scripts>
 			</Frame>
+			
 		</Frames>
 		<Scripts>
 			<OnLoad method="OnLoad"/>
 		</Scripts>
 	</Frame>
 
-	<Button name="IconSearchButtonTemplate" mixin="IconSearchButtonMixin" inherits="SelectorButtonTemplate" virtual="true">
-		<Layers>
-			<Layer level="OVERLAY">
-				<FontString parentKey="Name" inherits="GameFontHighlightSmallOutline">
-					<Size x="36" y="10"/>
-					<Anchors>
-						<Anchor point="BOTTOM" x="0" y="2"/>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-		<Scripts>
-			<OnEnter method="OnEnter"/>
-			<OnLeave method="OnLeave"/>
-		</Scripts>
-	</Button>
 
+	<Frame name="IconSearchButtonTemplate" frameStrata="HIGH"   virtual="true" >
+		<Size x="45" y="45"/>
+		<Anchors>
+			<Anchor point="TOPLEFT" x="0" y="0"/>
+		</Anchors>
+		<Frames>
+			<Button parentKey="button" mixin="IconSearchButtonMixin" inherits="SelectorButtonTemplate"  >
+				<Anchors>
+					<Anchor point="CENTER" x="0" y="0"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString parentKey="Name" inherits="GameFontHighlightSmallOutline">
+							<Size x="36" y="10"/>
+							<Anchors>
+								<Anchor point="BOTTOM" x="0" y="2"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter method="OnEnter"/>
+					<OnLeave method="OnLeave"/>
+					<OnClick method="OnClick"/>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
 
 
 	<Frame name="IconSearchFrame" parent="MacroPopupFrame" mixin="IconSearchMixin" >
@@ -91,15 +126,15 @@
 				</Layers>
 			</Frame>
 			
-			<ScrollFrame parentKey="IconSectionSelector"    mixin="IconSectionSelectorMixin" inherits="UIPanelScrollFrameCodeTemplate">
-				<Size x="494" y="361"/>
+			<ScrollFrame parentKey="IconSectionSelector" mixin="IconSectionSelectorMixin" inherits="UIPanelScrollFrameCodeTemplate">
+				<Size x="474" y="361"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" x="0" y="-25"/>
+					<Anchor point="TOPLEFT" x="20" y="-25"/>
 					<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
 				</Anchors>
 				<ScrollChild>
 					<Frame parentKey="Contents">
-						<Size x="494" y="0"/>
+						<Size x="474" y="0"/>
 						<Anchors>
 							<Anchor point="TOPLEFT" x="0" y="0"/>
 							<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
@@ -108,6 +143,7 @@
 				</ScrollChild>
 				<Scripts>
 					<OnLoad method="OnLoad"/>
+					<OnShow method="OnShow"/>
 				</Scripts>
 			</ScrollFrame>
 
