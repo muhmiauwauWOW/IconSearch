@@ -4,13 +4,15 @@
 ## Version: @project-version@
 ## Author: Muhmiauwau
 ## IconTexture: Interface\AddOns\IconSearch\icon.png
-## X-Curse-Project-ID: 
+## X-Curse-Project-ID: 1096791
 
 
 Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Libs\AceAddon-3.0\AceAddon-3.0.xml
+Libs\AceEvent-3.0\AceEvent-3.0.xml
 Libs\LibLodash\LibLodash.lua
 
 IconSearchData.lua
 IconSearch.lua
 frames.xml
-
