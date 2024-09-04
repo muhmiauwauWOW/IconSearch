@@ -1,17 +1,16 @@
 ﻿## Interface: 110002
 ## Title: IconSearch
-## Notes: The better icon selector 
+## Notes: Icon Search for macros, equipment sets and bank icons
 ## Version: @project-version@
 ## Author: Muhmiauwau
 ## IconTexture: Interface\AddOns\IconSearch\icon.png
-## LoadOnDemand: 1
-## LoadWith: Blizzard_MacroUI
 ## X-Curse-Project-ID: 
 
 
 Libs\LibStub\LibStub.lua
 Libs\LibLodash\LibLodash.lua
 
+IconSearchData.lua
 IconSearch.lua
 frames.xml
 

@@ -1,13 +1,37 @@
-
+local addonName, ns = ...
 IconSearchAddon = LibStub("AceAddon-3.0"):NewAddon("IconSearch", "AceEvent-3.0")
 local _ = LibStub("LibLodash-1"):Get()
 
 
 
 
-local defaultSearchMacroText = false
+local function createAddonFrame(p)
+	local frame = CreateFrame("Frame", nil, p, "IconSearchFrame")
+	frame:SetPoint("TOPLEFT", 0, -75)
+	frame:SetPoint("BOTTOMRIGHT", 0, 7)
+end
 
-SearchMacroText = nil
+function IconSearchAddon:OnInitialize()
+	createAddonFrame(GearManagerPopupFrame)
+
+	self:RegisterEvent("ADDON_LOADED","OnAddonLoaded")
+end
+
+
+function IconSearchAddon:OnAddonLoaded(event, name)
+	if name == "Blizzard_MacroUI" then
+		createAddonFrame(MacroPopupFrame)
+	end
+	if name == "Blizzard_GuildBankUI" then
+		createAddonFrame(GuildBankPopupFrame)
+	end
+
+	if name == "LargerMacroIconSelection" then
+		hooksecurefunc(LargerMacroIconSelection, "SetSearchData", function()
+			IconSearchAddon:SendMessage("tabchange", "Icons")		
+		end)
+	end
+end
 
 
 
@@ -21,42 +45,64 @@ function IconSearchMixin:OnLoad()
 
     self:SetTab(self.mainView);
 
-	MacroPopupFrame.BorderBox.IconTypeDropdown:SetParent(self.IconSearchBlizzadViewFrame)
-	MacroPopupFrame.IconSelector:SetParent(self.IconSearchBlizzadViewFrame)
+	self:GetParent().BorderBox.IconTypeDropdown:SetParent(self.IconSearchBlizzadViewFrame)
+	self:GetParent().IconSelector:SetParent(self.IconSearchBlizzadViewFrame)
+
+	IconSearchAddon:RegisterMessage("tabchange", function(self, type, arg)
+		if arg == "Icons" then 
+			self:SetTab(self.Blizz)
+		else
+			self:SetTab(self.mainView)
+		end
+	end, self)
+end
+
+function IconSearchMixin:OnShow()
+	self:reset()
+	self:SetTab(self.mainView)
 end
 
 
 
-IconSearchButtonMixin = {}
+function IconSearchMixin:search(searchString)
 
+	local frame = self.IconSearchViewFrame.IconSectionSelector
 
+	for widget in frame.pool:EnumerateActive() do
+		local data = _.filter(widget.IconSelector.data, function(icon) 
+			return string.find(string.lower(icon.search), searchString)
+		end)
 
-local lastActiveButton = nil
-
-function IconSearchButtonMixin:OnClick()
-	MacroPopupFrame.BorderBox.SelectedIconArea.SelectedIconButton:SetIconTexture(self.data.texture);
-
-	if lastActiveButton then
-		lastActiveButton.SelectedTexture:Hide()
+		widget:SetShown(#data > 0)
+		widget.IconSelector:renderIcons(data)
 	end
-	self.SelectedTexture:Show();
 
-	lastActiveButton = self
-	
+	frame:calcHeight()
+
 end
 
-function IconSearchButtonMixin:OnEnter()
-	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-	GameTooltip:AddLine(self.data.name)
-	GameTooltip:AddDoubleLine("Type:",self.data.type)
-	GameTooltip:AddDoubleLine("texture:",self.data.texture)
-	GameTooltip:AddLine(self.data.search)
-	GameTooltip:Show()
+
+function IconSearchMixin:reset()
+
+	self.IconSearchViewFrame.SearchBar:Reset()
+
+	local frame = self.IconSearchViewFrame.IconSectionSelector
+	for widget in frame.pool:EnumerateActive() do
+		widget.IconSelector:renderIcons(widget.IconSelector.data)
+		widget:Show()
+	end
+
+	frame:calcHeight()
+
 end
 
-function IconSearchButtonMixin:OnLeave()
-	GameTooltip:Hide();
-end
+
+
+
+
+
+
+
 
 
 
@@ -66,88 +112,89 @@ IconSectionSelectorMixin = {}
 
 function IconSectionSelectorMixin:OnLoad()
 	self.scrollBarHideable = false;
-	ScrollFrame_OnLoad(self);	
-	
-	
-	self.Data = ICONSEARCH_DATA
+	ScrollFrame_OnLoad(self)
 
-
+	self.firstTitle = CreateFrame("BUTTON", nil, self, "IconSelectorSectionTitleTemplate")
+	self.firstTitle.height = 36
+	
+	self.Data = ns.IconSearchData
 	self.pool = CreateFramePool("Frame", self.Contents, "IconSelectorSectionTemplate")
 
 
+	self.titleIdx = 1
+	self.heightTitleMap = {}
 
-	IconSearchAddon:RegisterMessage("search", function(self, search, searchString)
-		for widget in self.pool:EnumerateActive() do
-			
-			local data = _.filter(widget.IconSelector.data, function(icon) 
-				return string.find(string.lower(icon.search), searchString)
-			end)
+	self.lastScrollPos = 0
+end
 
-			widget:SetShown(#data > 0)
-			widget.IconSelector:renderIcons(data)
-		end
 
-		self:calcHeight()
-	end, self)
 
-	IconSearchAddon:RegisterMessage("reset", function(self, reset, searchString)
-		for widget in self.pool:EnumerateActive() do
-			widget.IconSelector:renderIcons(widget.IconSelector.data)
-			widget:Show()
-		end
+function IconSectionSelectorMixin:OnUpdate()
+	local scrollPos = self:GetVerticalScroll()
+	if  self.lastScrollPos ==  scrollPos then return end
+	local scrollDirection = self.lastScrollPos > scrollPos and "up" or "down"
+	self.lastScrollPos = scrollPos
 
-		self:calcHeight()
-	end, self)
-
+	if scrollDirection == "down" and  scrollPos > self.heightTitleMap[self.titleIdx]  then
+		self.titleIdx = self.titleIdx + 1
+		self.firstTitle:SetText(self.Data.sections[self.titleIdx].name);
+	end
+	
+	if self.titleIdx == 1 then return end
+	if scrollDirection == "up" and  scrollPos < self.heightTitleMap[self.titleIdx -1]  then
+		self.titleIdx = self.titleIdx - 1
+		self.firstTitle:SetText(self.Data.sections[self.titleIdx].name);
+	end
 end
 
 
 
 function IconSectionSelectorMixin:buildSections()
 	self.pool:ReleaseAll()
+
+	self.firstTitle:SetText(self.Data.sections[1].name);
+
+
 	_.forEach(self.Data.sections, function(section,idx)
+		if #section.obj == 0 then return end
 		local pos = ((idx - 1) * (136)) *-1
 		local frame = self.pool:Acquire();
 		frame.name = section.name
 		frame.height = 36
 		frame.IconSelector.initialized = false
-		print(section.name, #section.obj)
 		frame.IconSelector.data = section.obj
 		frame.Title:SetText(section.name);
 		frame:SetShown(#section.obj > 0)
 
 		-- frame.Texture = frame:CreateTexture()
 		-- frame.Texture:SetAllPoints()
-		-- frame.Texture:SetColorTexture(0,0, 0, 0.7)
+		-- frame.Texture:SetColorTexture(1,1,1, 0.7)
 	end)
 end
 
 
 
 function IconSectionSelectorMixin:OnShow()
-	DevTool:AddData(ICONSEARCH_DATA, "ICONSEARCH_DATA")
-	self.Data = ICONSEARCH_DATA
+	self.Data = ns.IconSearchData
 	self:buildSections()
 end
 
 function IconSectionSelectorMixin:calcHeight()
 	local height = 0
-	local children = {self.Contents:GetChildren()}
--- print("ddd calcHeight")
--- 	for widget in self.pool:EnumerateActive() do
--- 		print(widget.name)
--- 		widget:SetPoint("TOPLEFT", 0, height * -1)
--- 		height = height + widget.height
--- 	end
+	local children = { self.Contents:GetChildren() }
 
-
+	self.heightTitleMap = {}
 	table.foreach(children, function(idx, child)
-		if not child:IsShown() then return end
+		if not child:IsShown() then  self.heightTitleMap[idx] = height ; return end
 		child:SetPoint("TOPLEFT", 0, height * -1)
 		height = height + child.height
+		self.heightTitleMap[idx] = height
 	end)
 
 
+	self:GetParent().NoSearchResultsText:SetShown(height == 0)
+
+	self.firstTitle:SetShown(height > 0)
 	self.Contents:SetHeight(height)
 end
 
@@ -184,7 +231,6 @@ end
 
 function IconSelectorMixin:OnShow()
 	if not self.initialized then
-		print("init")
 		self:Init();
 	end
 end
@@ -200,7 +246,6 @@ function IconSelectorMixin:Init()
 		if type == "y" then return row * self.padding end
 		return (index - (row * self.cols)) *  self.padding
 	end
-	print(#self.data)
 
 	self:renderIcons()
 	self:GetParent():GetParent():GetParent():calcHeight()
@@ -221,6 +266,7 @@ function IconSelectorMixin:renderIcons(data)
 		frame:SetPoint("TOPLEFT", self, "TOPLEFT", self.getPos("x", idx), 0 - self.getPos("y", idx))
 		frame:SetHeight(45)
 		frame:SetWidth(45)
+		frame.button.parent = self:GetParent():GetParent():GetParent():GetParent():GetParent():GetParent()
 		frame.data = entry
 		frame.button.data = entry
 		frame.button.Icon:SetTexture(entry.texture);
@@ -258,18 +304,15 @@ IconSearchSearchBarMixin = {}
 function IconSearchSearchBarMixin:OnLoad()
 	SearchBoxTemplate_OnLoad(self);
 	self.clearButton:HookScript("OnClick", function(btn)
-	--	self:GetParent():reset()
-		IconSearchAddon:SendMessage("reset", true)
+		self:GetParent():GetParent():reset()
 		SearchBoxTemplateClearButton_OnClick(btn);
 	end)
 end
 function IconSearchSearchBarMixin:search(text)
     if string.len(text) == 0 then
-		--self:GetParent():reset()
-		IconSearchAddon:SendMessage("reset", true)
+		self:GetParent():GetParent():reset()
 	else
-	--	self:GetParent():search(text)
-		IconSearchAddon:SendMessage("search", text)
+		self:GetParent():GetParent():search(text)
 	end
 end
 
@@ -286,4 +329,53 @@ function IconSearchSearchBarMixin:Reset()
 	self:SetText("");
 end
 
+
+
+
+IconSearchNoResultButtonMixin = {}
+
+function IconSearchNoResultButtonMixin:OnClick()
+	local frame = self:GetParent():GetParent():GetParent()
+	frame:SetTab(frame.Blizz);
+	frame:reset()
+end
+
+
+
+
+
+
+
+IconSearchButtonMixin = {}
+
+local lastActiveButton = nil
+
+function IconSearchButtonMixin:OnClick()
+	self.parent.BorderBox.SelectedIconArea.SelectedIconButton:SetIconTexture(self.data.texture);
+
+	if lastActiveButton then
+		lastActiveButton.SelectedTexture:Hide()
+	end
+	self.SelectedTexture:Show();
+
+	lastActiveButton = self
+	
+end
+
+function IconSearchButtonMixin:OnEnter()
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+	GameTooltip:AddLine(self.data.name,  HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+
+	--@do-not-package@
+	GameTooltip:AddDoubleLine("Type:",self.data.type)
+	GameTooltip:AddDoubleLine("texture:",self.data.texture)
+	GameTooltip:AddLine(self.data.search)
+	--@end-do-not-package@
+
+	GameTooltip:Show()
+end
+
+function IconSearchButtonMixin:OnLeave()
+	GameTooltip:Hide();
+end
 
