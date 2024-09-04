@@ -1,0 +1,10 @@
+package-as: IconSearch
+
+ignore:
+  - README.md
+
+externals:
+  Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
+  Libs/LibLodash: https://github.com/muhmiauwauWOW/LibLodash.git
+
+enable-nolib-creation: no
