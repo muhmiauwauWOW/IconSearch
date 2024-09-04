@@ -14,96 +14,15 @@ SearchMacroText = nil
 IconSearchMixin = {}
 
 function IconSearchMixin:OnLoad()
-	
-	if true then return true end
+	TabSystemOwnerMixin.OnLoad(self);
+    self:SetTabSystem(self.TabSystem);
+    self.mainView = self:AddNamedTab("Icon Search", self.IconSearchViewFrame);
+   	self.Blizz = self:AddNamedTab("Icons", self.IconSearchBlizzadViewFrame);
 
-	self.Data = ICONSEARCH_DATA
-	self.searchString = nil
-	self.filterdIcons = {}
-	--self.updateFN = MacroFrame.Update
+    self:SetTab(self.mainView);
 
-	self.Icons = self.Data.all
-
-	
-
-
-	self.filterdIcons = self.Icons
-	
-
-	self.IconSelector:AdjustScrollBarOffsets(-14, -4, 6);
-
-	self.IconSelector:SetCustomStride(10);
-	-- self.IconSelector:SetCustomPadding(5, 5, 5, 5, 13, 13);
-	
-	local function InitIconButton(macroButton, selectionIndex, obj)
-		macroButton:SetIconTexture(obj.texture);
-		macroButton.Name:SetText(obj.name);
-		macroButton.data = obj
-	end
-	
-	self.IconSelector:SetSetupCallback(InitIconButton);
-
-
-
-	local function SelectedCallback(selectionIndex, obj)
-		local icon = obj.texture
-		if type(icon) == "string" then
-			icon = string.gsub(icon, [[INTERFACE\ICONS\]], "");
-		end
-
-		MacroPopupFrame.BorderBox.SelectedIconArea.SelectedIconButton:SetIconTexture(icon);
-		-- Index is not yet set, but we know if an icon in IconSelector was selected it was in the list, so set directly.
-		MacroPopupFrame.BorderBox.SelectedIconArea.SelectedIconText.SelectedIconDescription:SetText(ICON_SELECTION_CLICK);
-		MacroPopupFrame.BorderBox.SelectedIconArea.SelectedIconText.SelectedIconDescription:SetFontObject(GameFontHighlightSmall);
-	end
-
-	self.IconSelector:SetSelectedCallback(SelectedCallback);
-
-
-
-	local function GetIconInfo(selectionIndex)
-		return self.filterdIcons[selectionIndex]
-	end
-
-	local function GetNumIcon()
-		return #self.filterdIcons
-	end
-
-	self.IconSelector:SetSelectionsDataProvider(GetIconInfo, GetNumIcon);
-
-
-
-	self.NoSearchResultsText:SetAllPoints(self.IconSelector)
-
-
-
-end
-
-function IconSearchMixin:setFindMode(bool)
-	SearchMacroText = bool or defaultSearchMacroText
-	self.findmode = bool and "extended" or  "default"
-end
-function IconSearchMixin:repeatSearch()
-	if not self.searchString then return end
-	self:search(self.searchString)
-end
-
-function IconSearchMixin:search(str)
-	self.searchString = string.lower(str)
-	self.filterdIcons = _.filter(self.Icons, function(icon) 
-		return string.find(string.lower(icon.search), self.searchString)
-	end)
-	self.IconSelector:UpdateSelections();
-	self.NoSearchResultsText:SetShown(#self.filterdIcons == 0)
-end
-
-function IconSearchMixin:reset()
-	self.filterdIcons = self.Icons
-	self.IconSelector:UpdateSelections();
-	-- IconSearchFrame.Update = self.updateFN
-	-- IconSearchFrame:Update()
-	self.searchString = nil
-	self.SearchBar:Reset()
+	MacroPopupFrame.BorderBox.IconTypeDropdown:SetParent(self.IconSearchBlizzadViewFrame)
+	MacroPopupFrame.IconSelector:SetParent(self.IconSearchBlizzadViewFrame)
 end
 
 
@@ -111,8 +30,18 @@ end
 IconSearchButtonMixin = {}
 
 
-function IconSearchButtonMixin:OnClick()
 
+local lastActiveButton = nil
+
+function IconSearchButtonMixin:OnClick()
+	MacroPopupFrame.BorderBox.SelectedIconArea.SelectedIconButton:SetIconTexture(self.data.texture);
+
+	if lastActiveButton then
+		lastActiveButton.SelectedTexture:Hide()
+	end
+	self.SelectedTexture:Show();
+
+	lastActiveButton = self
 	
 end
 
