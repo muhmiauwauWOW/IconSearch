@@ -145,21 +145,24 @@ local i = 0
 local function addData(name, obj)
 	i = i + 1
 	ns.IconSearchData.sections[i] = {
+		idx = i,
 		name =  name,
 		obj = obj
 	}
 
-	tAppendAll(ns.IconSearchData.all, obj)
+	---tAppendAll(ns.IconSearchData.all, obj)
 end
 
 
 
+function ns.buildIcons()
+	addData("Spells", getSpells())
+	addData("Talents", getTalents())
+	addData("Equipment", getEquipment())
+	addData("Bags", getBags())
 
-addData("Spells", getSpells())
-addData("Talents", getTalents())
-addData("Equipment", getEquipment())
-addData("Bags", getBags())
-
+	sort(ns.IconSearchData, function(a,b) return a.idx < b.idx end)
+end
 
 
 

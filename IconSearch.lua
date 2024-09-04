@@ -5,15 +5,20 @@ local _ = LibStub("LibLodash-1"):Get()
 
 
 
-local function createAddonFrame(p)
+local function createAddonFrame(p, accountBank)
 	local frame = CreateFrame("Frame", nil, p, "IconSearchFrame")
 	frame:SetPoint("TOPLEFT", 0, -75)
 	frame:SetPoint("BOTTOMRIGHT", 0, 7)
+
+	if accountBank then 
+		frame:SetPoint("TOPLEFT", 0, -170)
+	end
 end
 
 function IconSearchAddon:OnInitialize()
+	ns.buildIcons()
 	createAddonFrame(GearManagerPopupFrame)
-
+	createAddonFrame(AccountBankPanel.TabSettingsMenu,true)
 	self:RegisterEvent("ADDON_LOADED","OnAddonLoaded")
 end
 
