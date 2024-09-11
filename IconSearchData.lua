@@ -4,7 +4,6 @@ local _ = LibStub("LibLodash-1"):Get()
 
 
 ns.IconSearchData = {}
-ns.IconSearchData.all = {}
 ns.IconSearchData.sections = {}
 
 
@@ -150,7 +149,6 @@ local function addData(name, obj)
 		obj = obj
 	}
 
-	---tAppendAll(ns.IconSearchData.all, obj)
 end
 
 
@@ -161,67 +159,5 @@ function ns.buildIcons()
 	addData("Equipment", getEquipment())
 	addData("Bags", getBags())
 
-	sort(ns.IconSearchData, function(a,b) return a.idx < b.idx end)
+	sort(ns.IconSearchData.sections, function(a,b) return a.idx < b.idx end)
 end
-
-
-
---addData("Items", {})
-
---local itemcache = {}
-
--- local addon = CreateFrame("Frame")
--- addon:RegisterEvent("ITEM_DATA_LOAD_RESULT")
--- addon:SetScript("OnEvent", function(self, event, itemID)
--- 	if itemcache[itemID] then return end
--- 	DevTool:AddData(itemID, "ITEM_DATA_LOAD_RESULT")
-
--- 	itemcache[itemID] = true
-
--- 	local info = {C_Item.GetItemInfo(itemID)}
--- 	if info then
--- 		table.insert(ns.IconSearchData.sections[1].obj, {
--- 			name = info[1],
--- 			texture = info[10],
--- 			type = "items",
--- 			search =  string.format("%s %s %s",info[1], info[10], itemID)
--- 		})
-
--- 		table.insert(ns.IconSearchData.all, {
--- 			name = info[1],
--- 			texture = info[10],
--- 			type = "items",
--- 			search =  string.format("%s %s %s",info[1], info[10], itemID)
--- 		})
--- 	end
--- end)
-
-
-
-
-
-
-
-
-
-
-
-
-
--- local spells = getSpells()
--- for i = 1, 50, 1 do
--- 	addData("Spells"..i, spells)
--- end
-
-
-
-
-
-
-
-
-
-
-
-
-

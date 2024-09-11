@@ -15,10 +15,10 @@ local function createAddonFrame(p, accountBank)
 	end
 end
 
-function IconSearchAddon:OnInitialize()
+function IconSearchAddon:OnEnable()
 	ns.buildIcons()
 	createAddonFrame(GearManagerPopupFrame)
-	createAddonFrame(AccountBankPanel.TabSettingsMenu,true)
+	createAddonFrame(AccountBankPanel.TabSettingsMenu, true)
 	self:RegisterEvent("ADDON_LOADED","OnAddonLoaded")
 end
 
@@ -159,21 +159,16 @@ function IconSectionSelectorMixin:buildSections()
 
 	self.firstTitle:SetText(self.Data.sections[1].name);
 
-
 	_.forEach(self.Data.sections, function(section,idx)
 		if #section.obj == 0 then return end
-		local pos = ((idx - 1) * (136)) *-1
 		local frame = self.pool:Acquire();
 		frame.name = section.name
+		frame.idx = section.idx
 		frame.height = 36
 		frame.IconSelector.initialized = false
 		frame.IconSelector.data = section.obj
 		frame.Title:SetText(section.name);
 		frame:SetShown(#section.obj > 0)
-
-		-- frame.Texture = frame:CreateTexture()
-		-- frame.Texture:SetAllPoints()
-		-- frame.Texture:SetColorTexture(1,1,1, 0.7)
 	end)
 end
 
@@ -182,15 +177,17 @@ end
 function IconSectionSelectorMixin:OnShow()
 	self.Data = ns.IconSearchData
 	self:buildSections()
+
 end
 
 function IconSectionSelectorMixin:calcHeight()
 	local height = 0
 	local children = { self.Contents:GetChildren() }
+	sort(children, function(a,b) return a.idx < b.idx end)
 
 	self.heightTitleMap = {}
 	table.foreach(children, function(idx, child)
-		if not child:IsShown() then  self.heightTitleMap[idx] = height ; return end
+		if not child:IsShown() then  self.heightTitleMap[idx] = height; return end
 		child:SetPoint("TOPLEFT", 0, height * -1)
 		height = height + child.height
 		self.heightTitleMap[idx] = height
@@ -253,7 +250,6 @@ function IconSelectorMixin:Init()
 	end
 
 	self:renderIcons()
-	self:GetParent():GetParent():GetParent():calcHeight()
 	self.initialized = true;
 end
 
