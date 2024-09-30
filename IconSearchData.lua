@@ -101,7 +101,7 @@ local function getEquipment()
 		if slotItem then
 			local info = {C_Item.GetItemInfo(slotItem)}
 			local itemTexture = GetInventoryItemTexture("player", i);
-			if itemTexture ~= nil then
+			if itemTexture ~= nil and info[1] ~= nil then
 				table.insert(tableObj, {
 					name = info[1],
 					texture = itemTexture,

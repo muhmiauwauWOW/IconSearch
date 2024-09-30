@@ -192,7 +192,12 @@
         "IconDataProvider_GetAllIconTypes",
         "GetKeysArray",
         "IconDataProviderIconType",
-        "MacroPopupFrameMixin"
+        "MacroPopupFrameMixin",
+        "MAX_TALENT_TIERS",
+        "NUM_TALENT_COLUMNS",
+        "ScrollFrame_OnLoad",
+        "TabSystemOwnerMixin",
+        "CreateFramePool"
     ],
     "Lua.diagnostics.disable": [
         "undefined-field",
