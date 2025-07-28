@@ -197,7 +197,10 @@
         "NUM_TALENT_COLUMNS",
         "ScrollFrame_OnLoad",
         "TabSystemOwnerMixin",
-        "CreateFramePool"
+        "CreateFramePool",
+        "INVSLOT_FIRST_EQUIPPED",
+        "INVSLOT_LAST_EQUIPPED",
+        "NUM_TOTAL_EQUIPPED_BAG_SLOTS"
     ],
     "Lua.diagnostics.disable": [
         "undefined-field",
@@ -216,6 +219,6 @@
         "utf8": "disable"
     },
     "Lua.workspace.library": [
-        "~\\.vscode\\extensions\\ketho.wow-api-0.17.6\\Annotations"
+        "~\\.vscode\\extensions\\ketho.wow-api-0.20.6\\Annotations\\Core"
     ]
 }
