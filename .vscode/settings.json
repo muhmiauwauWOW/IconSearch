@@ -204,7 +204,8 @@
     ],
     "Lua.diagnostics.disable": [
         "undefined-field",
-        "inject-field"
+        "inject-field",
+        "undefined-global"
     ],
     "Lua.runtime.version": "Lua 5.1",
     "Lua.runtime.builtin": {
