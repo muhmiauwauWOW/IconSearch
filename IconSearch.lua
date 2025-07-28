@@ -5,12 +5,10 @@ local _ = LibStub("LibLodash-1"):Get()
 -- Hilfsfunktion für sicheres Frame-Handling
 local function safeCreateFrame(parent, accountBank)
     if not parent then
-        print("[IconSearch] Warnung: Parent-Frame nicht gefunden!")
         return nil
     end
     local ok, frame = pcall(CreateFrame, "Frame", nil, parent, "IconSearchFrame")
     if not ok or not frame then
-        print("[IconSearch] Fehler beim Erstellen des Frames!")
         return nil
     end
     frame:SetPoint("TOPLEFT", 0, accountBank and -170 or -75)
@@ -20,7 +18,6 @@ end
 
 function IconSearchAddon:OnEnable()
     if not ns or not ns.buildIcons then
-        print("[IconSearch] Fehler: ns.buildIcons nicht verfügbar!")
         return
     end
     ns.buildIcons()
@@ -45,9 +42,9 @@ function IconSearchAddon:OnAddonLoaded(event, name)
 end
 
 IconSearchMixin = {}
-
 function IconSearchMixin:OnLoad()
     TabSystemOwnerMixin.OnLoad(self)
+	self.searchStr = ""
     self:SetTabSystem(self.TabSystem)
     self.mainView = self:AddNamedTab("Icon Search", self.IconSearchViewFrame)
     self.Blizz = self:AddNamedTab("Icons", self.IconSearchBlizzadViewFrame)
@@ -60,20 +57,24 @@ function IconSearchMixin:OnLoad()
 end
 
 function IconSearchMixin:OnShow()
-    self:reset()
+    -- self:reset()
     self:SetTab(self.mainView)
 end
 
 function IconSearchMixin:search(searchString)
-    local frame = self.IconSearchViewFrame.IconSectionSelector
-    for widget in frame.pool:EnumerateActive() do
-        local data = _.filter(widget.IconSelector.data, function(icon)
-            return string.find(string.lower(icon.search), searchString)
-        end)
-        widget:SetShown(#data > 0)
-        widget.IconSelector:renderIcons(data)
-    end
-    frame:calcHeight()
+	C_Timer.After(.1, function()
+		local frame = self.IconSearchViewFrame.IconSectionSelector
+		for widget in frame.pool:EnumerateActive() do
+			local data = _.filter(widget.IconSelector.data, function(icon)
+				return string.find(string.lower(icon.search), searchString)
+			end)
+			widget:SetShown(#data > 0)
+			widget.IconSelector:renderIcons(data)
+		end
+		frame:calcHeight() 
+		self.searchStr = searchString
+
+	end)
 end
 
 function IconSearchMixin:reset()
@@ -84,6 +85,11 @@ function IconSearchMixin:reset()
         widget:Show()
     end
     frame:calcHeight()
+	self.searchStr = ""
+end
+
+function IconSearchMixin:reSearch()
+	self:search(self.searchStr)
 end
 
 IconSectionSelectorMixin = {}
@@ -205,8 +211,10 @@ function IconSelectorMixin:renderIcons(data)
 end
 
 IconSearchSearchBarMixin = {}
+
 function IconSearchSearchBarMixin:OnLoad()
     SearchBoxTemplate_OnLoad(self)
+
     self.clearButton:HookScript("OnClick", function(btn)
         self:GetParent():GetParent():reset()
         SearchBoxTemplateClearButton_OnClick(btn)
@@ -219,6 +227,7 @@ function IconSearchSearchBarMixin:search(text)
         self:GetParent():GetParent():search(text)
     end
 end
+
 function IconSearchSearchBarMixin:OnEnterPressed()
     EditBox_ClearFocus(self)
     self:search(self:GetText())
@@ -259,3 +268,10 @@ function IconSearchButtonMixin:OnLeave()
     GameTooltip:Hide()
 end
 
+
+
+IconSearchViewFrameMixin = {}
+function IconSearchViewFrameMixin:OnShow()
+	self:GetParent():reSearch()
+
+end

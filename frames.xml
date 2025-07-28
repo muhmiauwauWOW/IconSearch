@@ -116,7 +116,7 @@
 	
 		<Frames>
 
-			<Frame parentKey="IconSearchViewFrame" >
+			<Frame parentKey="IconSearchViewFrame"   mixin="IconSearchViewFrameMixin">
 				<Anchors>
 					<Anchor point="TOPLEFT" x="0" y="-3"/>
 					<Anchor point="RIGHT" x="-38" />
@@ -186,6 +186,7 @@
 					</ScrollFrame>
 				</Frames>
 				<Scripts>
+					<OnShow method="OnShow"/>
 				</Scripts>
 			</Frame>
 
