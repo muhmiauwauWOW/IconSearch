@@ -22,7 +22,7 @@ function IconSearchAddon:OnEnable()
     end
     ns.buildIcons()
     safeCreateFrame(GearManagerPopupFrame)
-    safeCreateFrame(AccountBankPanel and AccountBankPanel.TabSettingsMenu, true)
+    safeCreateFrame(BankPanel and BankPanel.TabSettingsMenu, true)
     self:RegisterEvent("ADDON_LOADED", "OnAddonLoaded")
 end
 
