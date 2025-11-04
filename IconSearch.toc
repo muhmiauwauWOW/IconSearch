@@ -1,4 +1,4 @@
-﻿## Interface: 110200, 110107
+﻿## Interface: 110205
 ## Title: IconSearch
 ## Notes: Icon Search for macros, equipment sets and bank icons
 ## Version: @project-version@
