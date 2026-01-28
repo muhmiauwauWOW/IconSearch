@@ -64,10 +64,11 @@ end
 function IconSearchMixin:search(searchString)
 	C_Timer.After(.1, function()
 		local frame = self.IconSearchViewFrame.IconSectionSelector
-		for widget in frame.pool:EnumerateActive() do
-			local data = _.filter(widget.IconSelector.data, function(icon)
-				return string.find(string.lower(icon.search), searchString)
-			end)
+        local s = string.lower(searchString or "")
+        for widget in frame.pool:EnumerateActive() do
+            local data = _.filter(widget.IconSelector.data, function(icon)
+                return string.find(string.lower(icon.search), s)
+            end)
 			widget:SetShown(#data > 0)
 			widget.IconSelector:renderIcons(data)
 		end
