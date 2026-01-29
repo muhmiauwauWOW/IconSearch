@@ -39,6 +39,10 @@ function IconSearchAddon:OnAddonLoaded(event, name)
             IconSearchAddon:SendMessage("tabchange", "Icons")
         end)
     end
+
+    if name == "Blizzard_Transmog" then 
+       safeCreateFrame(TransmogFrame.OutfitPopup)
+    end
 end
 
 IconSearchMixin = {}
