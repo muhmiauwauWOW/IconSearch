@@ -144,12 +144,45 @@
 							<Button parentKey="button" frameStrata="HIGH" mixin="IconSearchNoResultButtonMixin"  inherits="UIPanelButtonTemplate" text="Try Blizzard">
 								<Size x="200" y="22"/>
 								<Anchors>
-									<Anchor point="TOP" y="-60"/>
+									<Anchor point="TOP" y="-200"/>
 								</Anchors>
 								<Scripts>
 									<OnClick method="OnClick"/>
 								</Scripts>
 							</Button>
+				
+
+							<EditBox parentKey="IconIdInput" autoFocus="false" historyLines="1" bytes="64"  inherits="InputBoxInstructionsTemplate">
+								<Size x="200" y="22"/>
+								<Anchors>
+									<Anchor point="TOP" y="-100"/>
+								</Anchors>
+							</EditBox>
+							<Button parentKey="UseIdButton" mixin="IconSearchUseIdButtonMixin" inherits="UIPanelButtonTemplate" text="Use">
+								<Size x="200" y="22"/>
+								<Anchors>
+									<Anchor point="TOP" y="-135"/>
+								</Anchors>
+								<Scripts>
+									<OnClick method="OnClick"/>
+								</Scripts>
+							</Button>
+
+							<EditBox name="wowheadcopy" inherits="InputBoxInstructionsTemplate">
+								<Size x="300" y="30"/>
+								<Anchors>
+									<Anchor point="TOP" y="-300"/>
+								</Anchors>
+								<FontString inherits="GameFontHighlight"/>
+								<Scripts>
+								<OnLoad>
+										self:SetText("https://www.wowhead.com/icons");
+									</OnLoad>
+									<OnEscapePressed>
+										self:ClearFocus();
+									</OnEscapePressed>
+								</Scripts>
+							</EditBox>
 						</Frames>
 						<Layers>
 							<Layer level="ARTWORK">
@@ -157,6 +190,18 @@
 									<Size x="250"/>
 									<Anchors>
 										<Anchor point="TOP"  relativeKey="$parent.MacroSelector" relativePoint="TOP" y="-30"/>
+									</Anchors>
+								</FontString>
+								<FontString inherits="SystemFont_Med1" text="Enter an icon ID or NAME, you can use the icon search on wowhead.com/icons" >
+									<Size x="250"/>
+									<Anchors>
+										<Anchor point="TOP"  relativeKey="$parent.MacroSelector" relativePoint="TOP" y="-60"/>
+									</Anchors>
+								</FontString>
+								<FontString inherits="SystemFont_Med3" text="OR" >
+									<Size x="250"/>
+									<Anchors>
+										<Anchor point="TOP"  relativeKey="$parent.MacroSelector" relativePoint="TOP" y="-170"/>
 									</Anchors>
 								</FontString>
 							</Layer>

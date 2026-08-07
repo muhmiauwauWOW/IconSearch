@@ -164,6 +164,22 @@ local function getBags()
     return tableObj
 end
 
+-- NUMBERS
+local function getNumbers()
+    local textureIDs = {6033345, 6033346, 6033347, 6033348, 6033349, 6033350, 6033351, 6033352, 6033353, 6033354}
+    local tableObj = {}
+    _.forEach(textureIDs, function(textureID, idx)
+        local numName = tostring(idx)
+        _.push(tableObj, {
+            name = numName,
+            texture = tostring(textureID),
+            type = "number",
+            search = safeFormat("%s %s", numName, tostring(textureID))
+        })
+    end)
+    return tableObj
+end
+
 -- Daten hinzufügen
 local i = 0
 local function addData(name, obj)
@@ -182,5 +198,6 @@ function ns.buildIcons()
     addData("Talents", getTalents())
     addData("Equipment", getEquipment())
     addData("Bags", getBags())
+    addData("Numbers", getNumbers())
     ns.IconSearchData.sections = _.sortBy(ns.IconSearchData.sections, function(a) return a.idx end)
 end

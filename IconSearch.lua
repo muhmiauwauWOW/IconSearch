@@ -112,6 +112,8 @@ function IconSectionSelectorMixin:OnLoad()
 end
 
 function IconSectionSelectorMixin:OnUpdate()
+    if not self.firstTitle then  return end
+    if not self.firstTitle:IsShown() then  return end
     local scrollPos = self:GetVerticalScroll()
     if self.lastScrollPos == scrollPos then return end
     local scrollDirection = self.lastScrollPos > scrollPos and "up" or "down"
@@ -249,6 +251,20 @@ function IconSearchNoResultButtonMixin:OnClick()
     local frame = self:GetParent():GetParent():GetParent()
     frame:SetTab(frame.Blizz)
     frame:reset()
+end
+
+IconSearchUseIdButtonMixin = {}
+function IconSearchUseIdButtonMixin:OnClick()
+    local input = self:GetParent().IconIdInput
+    local texture = input:GetText()
+    local id = tonumber(texture)
+    if not id and not string.find(texture, "^Interface\\Icons\\") then
+        texture = "Interface\\Icons\\" .. texture
+    end
+    local mainFrame = self:GetParent():GetParent():GetParent():GetParent()
+    if mainFrame and mainFrame.BorderBox then
+        mainFrame.BorderBox.SelectedIconArea.SelectedIconButton:SetIconTexture(id or texture)
+    end
 end
 
 IconSearchButtonMixin = {}
