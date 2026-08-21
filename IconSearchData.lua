@@ -144,8 +144,7 @@ local function getTalents()
     local numSpecGroups = 1
     if isWowVersionAtLeast("5.0.0") then
          numSpecGroups = GetNumSpecGroups(isInspect)
-    end 
-    print(numSpecGroups)
+    end
     for specIndex = 1, numSpecGroups do
         for tier = 1, MAX_TALENT_TIERS do
             for column = 1, NUM_TALENT_COLUMNS do
