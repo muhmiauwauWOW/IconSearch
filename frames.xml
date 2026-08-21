@@ -31,8 +31,8 @@
 		<HighlightTexture >
 			<Color r="1" g="1" b="1" a="0.1" />
 		</HighlightTexture>
-		<NormalFont style="Game15Font_Shadow"/>
-		<HighlightFont style="Game15Font_Shadow"/>
+		<NormalFont style="GameFontNormal"/>
+		<HighlightFont style="GameFontHighlight"/>
 	</Button>
 
 
@@ -58,7 +58,7 @@
 						</Anchors>
 						<Layers>
 							<Layer level="ARTWORK">
-								<FontString inherits="SystemFont_Med3" text="QUEST_LOG_NO_RESULTS" >
+								<FontString inherits="SystemFont_Med3" text="No Icons found" >
 									<Size x="450" y="36" />
 									<Anchors>
 										<Anchor point="TOP"  y="0"/>
@@ -186,7 +186,7 @@
 						</Frames>
 						<Layers>
 							<Layer level="ARTWORK">
-								<FontString inherits="SystemFont_Med3" text="QUEST_LOG_NO_RESULTS" >
+								<FontString inherits="SystemFont_Med3" text="No Icons found" >
 									<Size x="250"/>
 									<Anchors>
 										<Anchor point="TOP"  relativeKey="$parent.MacroSelector" relativePoint="TOP" y="-30"/>
