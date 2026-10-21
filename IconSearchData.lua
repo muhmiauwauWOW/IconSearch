@@ -12,20 +12,34 @@ local function safeCall(fn, ...)
     return nil
 end
 
--- Prüft, ob die aktuelle WoW-Version mindestens der angegebenen Version entspricht.
-local function isWowVersionAtLeast(minVersion)
-    local currentVersion = GetBuildInfo()
-    local currentMajor, currentMinor, currentPatch = tostring(currentVersion or "0"):match("^(%d+)%.?(%d*)%.?(%d*)")
-    local requiredMajor, requiredMinor, requiredPatch = tostring(minVersion or "0"):match("^(%d+)%.?(%d*)%.?(%d*)")
 
-    currentMajor, currentMinor, currentPatch = tonumber(currentMajor) or 0, tonumber(currentMinor) or 0,
-        tonumber(currentPatch) or 0
-    requiredMajor, requiredMinor, requiredPatch = tonumber(requiredMajor) or 0, tonumber(requiredMinor) or 0,
-        tonumber(requiredPatch) or 0
+local function versionAtLeast(current, required)
+    local function parse(version)
+        local major, minor, patch = tostring(version or "0"):match("^(%d+)%.(%d+)%.?(%d*)")
+        return tonumber(major) or 0, tonumber(minor) or 0, tonumber(patch) or 0
+    end
+
+    local currentMajor, currentMinor, currentPatch = parse(current)
+    local requiredMajor, requiredMinor, requiredPatch = parse(required)
 
     if currentMajor ~= requiredMajor then return currentMajor > requiredMajor end
     if currentMinor ~= requiredMinor then return currentMinor > requiredMinor end
     return currentPatch >= requiredPatch
+end
+
+local function isWowVersionAtLeast(...)
+    local currentVersion = GetBuildInfo()
+    for index = 1, select("#", ...) do
+        if versionAtLeast(currentVersion, select(index, ...)) then
+            return true
+        end
+    end
+    return false
+end
+
+local function isWowVersionInRange(minimum, maximum)
+    local currentVersion = GetBuildInfo()
+    return versionAtLeast(currentVersion, minimum) and versionAtLeast(maximum, currentVersion)
 end
 
 -- Hilfsfunktion für nil-sichere string.format
@@ -142,19 +156,23 @@ local function getTalents()
     local tableObj, seen = {}, {}
     local isInspect = false
     local numSpecGroups = 1
-    if isWowVersionAtLeast("5.0.0") then
+    if isWowVersionAtLeast("5.0.0") or isWowVersionInRange("1.60.0", "1.99") then
          numSpecGroups = GetNumSpecGroups(isInspect)
     end
+
+    local maxTalentTiers = MAX_TALENT_TIERS or nil
     for specIndex = 1, numSpecGroups do
-        for tier = 1, MAX_TALENT_TIERS do
-            for column = 1, NUM_TALENT_COLUMNS do
-                local t = { GetTalentInfo(tier, column, specIndex) }
-                addTalent(tableObj, seen, t)
+        if maxTalentTiers then
+            for tier = 1, maxTalentTiers do
+                for column = 1, NUM_TALENT_COLUMNS do
+                    local t = { GetTalentInfo(tier, column, specIndex) }
+                    addTalent(tableObj, seen, t)
+                end
             end
         end
     end
 
-    if isWowVersionAtLeast("8.0.2") then
+    if isWowVersionAtLeast("8.0.2") or isWowVersionInRange("1.60.0", "1.99") then
         local slotInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(1)
         if slotInfo and slotInfo.availableTalentIDs then
             addPvPTalents(tableObj, seen, slotInfo.availableTalentIDs)
@@ -272,7 +290,7 @@ end
 function ns.buildIcons()
     i = 0 -- Reset für wiederholte Aufrufe
 
-    if isWowVersionAtLeast("11.0.0") then
+    if isWowVersionAtLeast("11.0.0") or isWowVersionInRange("1.60.0", "1.99") then
         addData("Spells", getSpells())
     else
         addData("Spells", getClassicSpells())
@@ -281,12 +299,14 @@ function ns.buildIcons()
     addData("Talents", getTalents())
     addData("Equipment", getEquipment())
 
-    if isWowVersionAtLeast("11.0.0") then
+    if isWowVersionAtLeast("11.0.0") or isWowVersionInRange("1.60.0", "1.99") then
         addData("Bags", getBags())
     else
         addData("Bags", getClassicBags())
     end
-    if isWowVersionAtLeast("11.0.5") then addData("Numbers", getNumbers()) end
+    if isWowVersionAtLeast("11.0.5") or isWowVersionInRange("1.60.0", "1.99") then
+        addData("Numbers", getNumbers())
+    end
 
     ns.IconSearchData.sections = _.sortBy(ns.IconSearchData.sections, function(a) return a.idx end)
 end
